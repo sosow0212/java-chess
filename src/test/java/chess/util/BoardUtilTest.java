@@ -1,12 +1,19 @@
 package chess.util;
 
+import static chess.util.PieceParser.parsePiece;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import chess.domain.board.Position;
+import chess.domain.pieces.Bishop;
 import chess.domain.pieces.King;
+import chess.domain.pieces.Knight;
 import chess.domain.pieces.Name;
+import chess.domain.pieces.Pawn;
 import chess.domain.pieces.Piece;
+import chess.domain.pieces.Place;
+import chess.domain.pieces.Queen;
+import chess.domain.pieces.Rook;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +62,39 @@ class BoardUtilTest {
         assertAll(
                 () -> assertThat(chessBoard.get(Position.from("a1")).getName()).isEqualTo("k"),
                 () -> assertThat(chessBoard.get(Position.from("a2")).getName()).isEqualTo("p")
+        );
+    }
+
+    @Test
+    @DisplayName("기물의 이름으로 Piece 객체를 반환한다.")
+    void returns_piece_when_input_is_piece_name() {
+        // given
+        String rookName = "r";
+        String knightName = "n";
+        String bishopName = "b";
+        String queenName = "q";
+        String pawnName = "p";
+        String kingName = "k";
+        String placeName = ".";
+
+        // when
+        Piece rook = parsePiece(rookName);
+        Piece knight = parsePiece(knightName);
+        Piece bishop = parsePiece(bishopName);
+        Piece queen = parsePiece(queenName);
+        Piece pawn = parsePiece(pawnName);
+        Piece king = parsePiece(kingName);
+        Piece place = parsePiece(placeName);
+
+        // then
+        assertAll(
+                () -> assertThat(rook instanceof Rook).isEqualTo(true),
+                () -> assertThat(knight instanceof Knight).isEqualTo(true),
+                () -> assertThat(bishop instanceof Bishop).isEqualTo(true),
+                () -> assertThat(queen instanceof Queen).isEqualTo(true),
+                () -> assertThat(pawn instanceof Pawn).isEqualTo(true),
+                () -> assertThat(king instanceof King).isEqualTo(true),
+                () -> assertThat(place instanceof Place).isEqualTo(true)
         );
     }
 }
