@@ -1,7 +1,5 @@
 package chess.view;
 
-import static chess.util.PieceParser.parsePiece;
-
 import chess.domain.board.Position;
 import chess.domain.pieces.Piece;
 import chess.dto.PieceDto;
@@ -24,9 +22,9 @@ public class OutputView {
     }
 
     public void printBoard(final List<PieceDto> pieces) {
-        Map<Position, Piece> board = new HashMap<>();
+        Map<Position, String> board = new HashMap<>();
 
-        pieces.forEach(pieceDto -> board.put(Position.from(findPosition(pieceDto)), parsePiece(pieceDto.getPiece())));
+        pieces.forEach(pieceDto -> board.put(Position.from(findPosition(pieceDto)), pieceDto.getPiece()));
 
         System.out.println();
         for (char row = '8'; row >= '1'; row--) {
@@ -39,10 +37,10 @@ public class OutputView {
         return String.valueOf(pieceDto.getRow()) + pieceDto.getCol();
     }
 
-    private void printLine(final Map<Position, Piece> board, final char row) {
+    private void printLine(final Map<Position, String> board, final char row) {
         for (char col = 'a'; col <= 'h'; col++) {
             String position = String.valueOf(col) + row;
-            System.out.print(board.get(Position.from(position)).getName());
+            System.out.print(board.get(Position.from(position)));
         }
     }
 }

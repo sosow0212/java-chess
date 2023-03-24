@@ -63,7 +63,7 @@ public class ChessGameController {
             chessGame = checkCreateNewGame(chessGame, command);
 
             checkMovePiece(chessGame, command);
-            outputView.printBoard(BoardResultDto.toDto(new Board(chessGame.getBoard())).getPieces());
+            outputView.printBoard(BoardResultDto.toDto(chessGame.getBoard()).getPieces());
 
             if (isGameDone(chessGame)) {
                 break;
