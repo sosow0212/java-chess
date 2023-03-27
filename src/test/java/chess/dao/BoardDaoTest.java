@@ -25,7 +25,7 @@ class BoardDaoTest {
     @Order(1)
     void connection_success() {
         // when & then
-        try (final var connection = boardDao.getConnection()) {
+        try (final var connection = MySqlManager.getConnection()) {
             assertThat(connection).isNotNull();
         } catch (SQLException e) {
             throw new RuntimeException(e);
