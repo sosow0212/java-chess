@@ -1,4 +1,4 @@
-package chess.dao.board;
+package chess.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -83,6 +83,25 @@ public class BoardDao {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public void updateByBoardId(final int boardId, final String position, final String piece, final boolean isLowerTeamTurn) {
+        final String query = "UPDATE board SET position=?, piece=?, isLowerTeamTurn=? WHERE board_id=?";
+
+        try (final var connection = getConnection();
+             final var preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, position);
+            preparedStatement.setString(2, piece);
+            preparedStatement.setBoolean(3, isLowerTeamTurn);
+            preparedStatement.setInt(4, boardId);
+
+            preparedStatement.executeUpdate();
+
+        } catch (final SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("board 업데이트 실패");
+        }
     }
 
     public void remove(final int boardId) {

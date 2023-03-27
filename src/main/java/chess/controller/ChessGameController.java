@@ -1,8 +1,7 @@
 package chess.controller;
 
-import chess.domain.board.Board;
 import chess.domain.commnad.Command;
-import chess.domain.commnad.LoadGameCommand;
+import chess.domain.commnad.RoomCommand;
 import chess.domain.game.ChessGame;
 import chess.dto.BoardResultDto;
 import chess.dto.BoardSaveDto;
@@ -13,10 +12,10 @@ import chess.service.BoardService;
 import chess.view.InputView;
 import chess.view.OutputView;
 import chess.view.ResultView;
+import java.util.List;
+import java.util.Scanner;
 
 public class ChessGameController {
-
-    private static final int BOARD_ID = 1;
 
     private final InputView inputView;
     private final OutputView outputView;
@@ -33,39 +32,45 @@ public class ChessGameController {
         this.boardService = boardService;
     }
 
-    public void run() {
-        LoadGameCommand loadGameCommand = inputView.readStatusOfGame();
-        ChessGame chessGame = loadGame(loadGameCommand);
+    public void ready() {
+        List<Integer> roomNumbers = boardService.findAllRoomNumbers();
 
-        outputView.printStartMessage();
-        playChess(chessGame);
+        RoomCommand roomCommand = inputView.readEnterGame();
 
-        resultView.printGameEnd();
-    }
-
-    private ChessGame loadGame(final LoadGameCommand loadCommand) {
-        if (loadCommand.isSavedGame()) {
-            ChessGameResponseDto chessGameResponseDto = boardService.findById(BOARD_ID);
-            BoardResultDto boardResultDto = chessGameResponseDto.getBoardResultDto();
-
-            outputView.printBoard(boardResultDto.getPieces());
-            return new ChessGame(BoardFactory.createFromDto(boardResultDto), chessGameResponseDto.isLowerTeamTurn());
+        if (roomCommand.isCreateGame()) {
+            ChessGame chessGame = new ChessGame(BoardFactory.createBoard(), true);
+            outputView.printStartMessage();
+            playChess(chessGame, roomNumbers.size() + 1);
+            resultView.printGameEnd();
         }
 
-        return new ChessGame(BoardFactory.createBoard(), true);
+        if (roomCommand.isEnterGame()) {
+            outputView.printCreatedRoomNumbers(roomNumbers);
+            int roomNumber = inputView.readRoomNumber();
+
+            outputView.printStartMessage();
+            ChessGameResponseDto chessGameResponseDto = boardService.findBoardById(roomNumber);
+            BoardResultDto boardResultDto = boardService.findBoardById(roomNumber).getBoardResultDto();
+
+            outputView.printBoard(boardResultDto.getPieces());
+            ChessGame chessGame = new ChessGame(BoardFactory.createFromDto(boardResultDto),
+                    chessGameResponseDto.isLowerTeamTurn());
+
+            playChess(chessGame, roomNumber);
+            resultView.printGameEnd();
+        }
     }
 
-
-    private void playChess(ChessGame chessGame) {
+    private void playChess(ChessGame chessGame, final int nowRoomNumber) {
         Command command = inputView.readGameCommand();
 
-        while (!isGameEndCase(chessGame, command)) {
+        while (!isGameEndCase(chessGame, command, nowRoomNumber)) {
             chessGame = checkCreateNewGame(chessGame, command);
 
             checkMovePiece(chessGame, command);
             outputView.printBoard(BoardResultDto.toDto(chessGame.getBoard()).getPieces());
 
-            if (isGameDone(chessGame)) {
+            if (isGameDone(chessGame, nowRoomNumber)) {
                 break;
             }
 
@@ -73,11 +78,16 @@ public class ChessGameController {
         }
     }
 
-    private boolean isGameEndCase(final ChessGame chessGame, final Command command) {
+    private boolean isGameEndCase(final ChessGame chessGame, final Command command, final int nowRoomNumber) {
         if (isGameEnd(chessGame, command)) {
             resultView.printGameEndWithSaving();
-            boardService.delete(BOARD_ID);
-            boardService.save(BoardSaveDto.toDto(BOARD_ID, chessGame));
+            if (boardService.isEmptyById(nowRoomNumber)) {
+                boardService.delete(nowRoomNumber);
+                boardService.save(BoardSaveDto.toDto(nowRoomNumber, chessGame));
+            }
+            if (!boardService.isEmptyById(nowRoomNumber)) {
+                boardService.update(BoardSaveDto.toDto(nowRoomNumber, chessGame));
+            }
             return true;
         }
 
@@ -106,10 +116,10 @@ public class ChessGameController {
         return chessGame;
     }
 
-    private boolean isGameDone(final ChessGame chessGame) {
+    private boolean isGameDone(final ChessGame chessGame, final int nowRoomNumber) {
         if (isKingDead(chessGame)) {
             resultView.printGameEndWithDeleting();
-            boardService.delete(BOARD_ID);
+            boardService.delete(nowRoomNumber);
             return true;
         }
 

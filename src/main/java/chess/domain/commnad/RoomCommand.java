@@ -2,26 +2,25 @@ package chess.domain.commnad;
 
 import chess.exception.CommandMessage;
 
-public enum LoadGameCommand {
+public enum RoomCommand {
 
-    NEW_GAME("1"),
-    SAVED_GAME("2");
+    CREATE_GAME("1"),
+    ENTER_GAME("2");
 
     private final String command;
 
-    LoadGameCommand(final String command) {
+    RoomCommand(final String command) {
         this.command = command;
     }
 
-    public static LoadGameCommand from(final String command) {
+    public static RoomCommand from(final String command) {
         validate(command);
-        
         if (command.equals("1")) {
-            return NEW_GAME;
+            return CREATE_GAME;
         }
 
         if (command.equals("2")) {
-            return SAVED_GAME;
+            return ENTER_GAME;
         }
 
         throw new IllegalArgumentException("잘못된 명령어를 입력하셨습니다.");
@@ -33,11 +32,11 @@ public enum LoadGameCommand {
         }
     }
 
-    public boolean isNewGame() {
-        return this == NEW_GAME;
+    public boolean isCreateGame() {
+        return this == CREATE_GAME;
     }
 
-    public boolean isSavedGame() {
-        return this == SAVED_GAME;
+    public boolean isEnterGame() {
+        return this == ENTER_GAME;
     }
 }

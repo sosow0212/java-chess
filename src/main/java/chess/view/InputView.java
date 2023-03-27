@@ -1,7 +1,7 @@
 package chess.view;
 
 import chess.domain.commnad.Command;
-import chess.domain.commnad.LoadGameCommand;
+import chess.domain.commnad.RoomCommand;
 import java.util.Scanner;
 
 public class InputView {
@@ -18,14 +18,24 @@ public class InputView {
         }
     }
 
-    public LoadGameCommand readStatusOfGame() {
+    public RoomCommand readEnterGame() {
         try {
-            System.out.println("새로운 게임 하기 : 1, 저장된 게임 불러오기 : 2");
+            System.out.println("1 : 체스 방 만들기, 2 : 체스 게임방 입장하기");
             String command = input.nextLine();
-            return LoadGameCommand.from(command);
+            return RoomCommand.from(command);
         } catch (IllegalArgumentException exception) {
-            System.out.println("커맨드가 올바른지 확인하세요.");
-            return readStatusOfGame();
+            System.out.println(exception.getMessage());
+            return readEnterGame();
+        }
+    }
+
+    public int readRoomNumber() {
+        try {
+            System.out.println("방 번호를 입력해주세요.");
+            return input.nextInt();
+        } catch (IllegalArgumentException exception) {
+            System.out.println(exception.getMessage());
+            return readRoomNumber();
         }
     }
 }

@@ -16,6 +16,6 @@ public class Application {
                 new BoardService()
         );
 
-        chessGameController.run();
+        chessGameController.ready();
     }
 }

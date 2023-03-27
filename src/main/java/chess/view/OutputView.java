@@ -43,4 +43,9 @@ public class OutputView {
             System.out.print(board.get(Position.from(position)));
         }
     }
+
+    public void printCreatedRoomNumbers(final List<Integer> roomNumbers) {
+        System.out.print("현재 생성된 방 번호 : ");
+        System.out.println(roomNumbers);
+    }
 }

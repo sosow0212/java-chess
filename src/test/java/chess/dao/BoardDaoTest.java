@@ -3,7 +3,6 @@ package chess.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import chess.dao.board.BoardDao;
 import java.sql.SQLException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

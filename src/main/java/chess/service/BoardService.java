@@ -1,6 +1,7 @@
 package chess.service;
 
-import chess.dao.board.BoardDao;
+import chess.dao.BoardDao;
+import chess.dao.RoomDao;
 import chess.domain.board.Position;
 import chess.domain.pieces.Piece;
 import chess.dto.BoardSaveDto;
@@ -16,6 +17,7 @@ public class BoardService {
     private static final int PIECE_INDEX = 1;
 
     private final BoardDao boardDao = new BoardDao();
+    private final RoomDao roomDao = new RoomDao();
     private final BoardUtil boardUtil = new BoardUtil();
 
     public void save(final BoardSaveDto boardSaveDto) {
@@ -24,9 +26,10 @@ public class BoardService {
         String compressedPiece = compressedBoard.get(PIECE_INDEX);
 
         boardDao.save(boardSaveDto.getBoardId(), compressedPosition, compressedPiece, boardSaveDto.isLowerTeamTurn());
+        roomDao.save(boardSaveDto.getBoardId());
     }
 
-    public ChessGameResponseDto findById(final int boardId) {
+    public ChessGameResponseDto findBoardById(final int boardId) {
         List<String> compressedBoardFromDatabase = boardDao.findById(boardId);
 
         if (compressedBoardFromDatabase.isEmpty()) {
@@ -39,7 +42,24 @@ public class BoardService {
                 boardDao.isLowerTeamTurnByBoardId(boardId));
     }
 
+    public boolean isEmptyById(final int boardId) {
+        return boardDao.findById(boardId).isEmpty();
+    }
+
     public void delete(final int boardId) {
         boardDao.remove(boardId);
+    }
+
+    public void update(final BoardSaveDto boardSaveDto) {
+        List<String> compressedBoard = boardUtil.compressBoard(boardSaveDto.getBoard());
+        String compressedPosition = compressedBoard.get(POSITION_INDEX);
+        String compressedPiece = compressedBoard.get(PIECE_INDEX);
+
+        boardDao.updateByBoardId(boardSaveDto.getBoardId(), compressedPosition, compressedPiece,
+                boardSaveDto.isLowerTeamTurn());
+    }
+
+    public List<Integer> findAllRoomNumbers() {
+        return roomDao.findAll();
     }
 }
